@@ -124,12 +124,6 @@
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
                     <Label Text="{Binding RisultatoCF}" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
 
-                    <!--<Button Text="Copia" 
-                        Command="{Binding CopiaCodiceCommand}"
-                        FontSize="Caption" 
-                        Padding="5"
-                        HeightRequest="35" />-->
-
                     <Button Command="{Binding CopiaCodiceCommand}"
                         BackgroundColor="Transparent"
                         Padding="10"
