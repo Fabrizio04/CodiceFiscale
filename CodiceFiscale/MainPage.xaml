@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CodiceFiscale.ViewModels"
+             x:Class="CodiceFiscale.MainPage"
+             Title="Calcolo Codice Fiscale"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <vm:MainViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <VerticalStackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ChiudiSuggerimentiCommand}" />
+            </VerticalStackLayout.GestureRecognizers>
+
+            <Label Text="Calcolo Codice Fiscale" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+            <Label Text="Dati Personali" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+            <Entry Placeholder="Cognome" Text="{Binding Cognome}" ClearButtonVisibility="WhileEditing" ReturnType="Next">
+                <Entry.Keyboard>
+                    <Keyboard x:FactoryMethod="Create">
+                        <x:Arguments>
+                            <KeyboardFlags>CapitalizeCharacter</KeyboardFlags>
+                        </x:Arguments>
+                    </Keyboard>
+                </Entry.Keyboard>
+            </Entry>
+
+            <Entry Placeholder="Nome" Text="{Binding Nome}" ClearButtonVisibility="WhileEditing" ReturnType="Next">
+                <Entry.Keyboard>
+                    <Keyboard x:FactoryMethod="Create">
+                        <x:Arguments>
+                            <KeyboardFlags>CapitalizeCharacter</KeyboardFlags>
+                        </x:Arguments>
+                    </Keyboard>
+                </Entry.Keyboard>
+            </Entry>
+
+            <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+
+                <VerticalStackLayout Grid.Column="0" Spacing="5">
+                    <Label Text="Data di Nascita" FontAttributes="Bold" FontSize="12" />
+                    <DatePicker Date="{Binding DataNascita}" 
+                    Format="dd/MM/yyyy"
+                    MaximumDate="{x:Static x:DateTime.Now}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                    <Label Text="Genere" FontAttributes="Bold" FontSize="12" />
+                    <HorizontalStackLayout Spacing="10">
+                        <RadioButton Content="M" IsChecked="{Binding IsMaschio}" />
+                        <RadioButton Content="F" IsChecked="{Binding IsFemmina}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+            </Grid>
+
+            <VerticalStackLayout Spacing="5">
+                <Border Stroke="#2196F3" Padding="5" StrokeShape="RoundRectangle 8">
+                    <Entry Placeholder="Comune di nascita" Text="{Binding ComuneDigitato}" Unfocused="OnComuneEntryUnfocused" ClearButtonVisibility="WhileEditing" ReturnType="Done">
+                        <Entry.Keyboard>
+                            <Keyboard x:FactoryMethod="Create">
+                                <x:Arguments>
+                                    <KeyboardFlags>CapitalizeCharacter</KeyboardFlags>
+                                </x:Arguments>
+                            </Keyboard>
+                        </Entry.Keyboard>
+                    </Entry>
+                </Border>
+
+                <Border IsVisible="{Binding IsSuggerimentiVisible}" 
+                    Stroke="Gray" 
+                    MaximumHeightRequest="150"
+                    ZIndex="10">
+                    <CollectionView ItemsSource="{Binding SuggerimentiComuni}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10">
+                                    <Label Text="{Binding Nome}" VerticalOptions="Center" />
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=SelezionaComuneCommand}"
+                                CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+            </VerticalStackLayout>
+
+            <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                <Button Grid.Column="0" Text="RESET" 
+                    Command="{Binding ResetFormCommand}"
+                    BackgroundColor="Gray" TextColor="White" />
+
+                <Button Grid.Column="1" Text="CALCOLA" 
+                        Command="{Binding CalcolaCommand}"
+                        BackgroundColor="#2196F3" 
+                        TextColor="White">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroupList>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Normal" />
+                                <VisualState Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="#BDBDBD" />
+                                        <Setter Property="TextColor" Value="#757575" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </VisualStateManager.VisualStateGroups>
+                </Button>
+
+            </Grid>
+
+            <Border BackgroundColor="#F0F0F0" Padding="10" StrokeShape="RoundRectangle 10">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
+                    <Label Text="{Binding RisultatoCF}" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
+
+                    <!--<Button Text="Copia" 
+                        Command="{Binding CopiaCodiceCommand}"
+                        FontSize="Caption" 
+                        Padding="5"
+                        HeightRequest="35" />-->
+
+                    <Button Command="{Binding CopiaCodiceCommand}"
+                        BackgroundColor="Transparent"
+                        Padding="10"
+                        HeightRequest="44"
+                        WidthRequest="44"
+                        ToolTipProperties.Text="Copia negli appunti">
+                        <Button.ImageSource>
+                            <FileImageSource File="copy_icon.png" />
+                        </Button.ImageSource>
+                    </Button>
+
+                </HorizontalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
