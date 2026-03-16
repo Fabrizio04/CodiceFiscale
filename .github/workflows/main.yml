@@ -1,9 +1,7 @@
-name: MAUI Build
+name: MAUI Build & Release Android
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
 jobs:
@@ -25,8 +23,20 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
-    - name: Build Windows
-      run: dotnet build -f net10.0-windows10.0.19041.0 -c Release
+    # Estraiamo il Keystore dai Secrets
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_FILE }}" > keystore_base64.txt
+        certutil -decode keystore_base64.txt Fabrizio.keystore
 
-    - name: Build Android
-      run: dotnet build -f net10.0-android -c Release
+    # Pubblicazione Android (Genera l'APK)
+    - name: Publish Android
+      run: dotnet publish -f net10.0-android -c Release /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=Fabrizio.keystore /p:AndroidSigningStorePass=${{ secrets.KEYSTORE_PASSWORD }} /p:AndroidSigningKeyAlias=${{ secrets.KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.KEYSTORE_PASSWORD }}
+
+    # Carica l'APK come Artifact (così puoi scaricarlo)
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodiceFiscale-Android
+        path: |
+          **/*-Signed.apk
