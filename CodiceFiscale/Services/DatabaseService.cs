@@ -1,18 +1,33 @@
-﻿using SQLite;
-using CodiceFiscale.Models;
+﻿using CodiceFiscale.Models;
+using SQLite;
 
 namespace CodiceFiscale.Services
 {
     public class DatabaseService
     {
-        SQLiteAsyncConnection _database;
+        private SQLiteAsyncConnection _database;
+        public const SQLiteOpenFlags Flags =
+        // open the database in read/write mode
+        SQLiteOpenFlags.ReadWrite |
+        // create the database if it doesn't exist
+        SQLiteOpenFlags.Create |
+        // enable multi-threaded database access
+        SQLiteOpenFlags.SharedCache;
+
+        private const string DB_NAME = "CodiceFiscale.db3";
 
         private async Task Init()
         {
             if (_database is not null)
                 return;
 
-            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "CodiceFiscale.db3");
+            //var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "CodiceFiscale.db3");
+            var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppInfo.Current.PackageName);
+            
+            if (!Directory.Exists(dbPath))
+                Directory.CreateDirectory(dbPath);
+
+            dbPath = Path.Combine(dbPath, DB_NAME);
 
             //Cancellazione
             //if (File.Exists(dbPath))
@@ -20,7 +35,7 @@ namespace CodiceFiscale.Services
             //    File.Delete(dbPath);
             //}
 
-            _database = new SQLiteAsyncConnection(dbPath);
+            _database = new SQLiteAsyncConnection(dbPath, Flags);
 
             // Crea la tabella se non esiste
             await _database.CreateTableAsync<Comune>();
